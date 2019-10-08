@@ -7,8 +7,6 @@ class Logger
     const LEVEL_ERROR = 'ERROR';
     const LEVEL_FATAL = 'FATAL';
 
-    private static $logger;
-
     private $file_path;
     private $handle;
     private $level_list = [
@@ -62,10 +60,11 @@ class Logger
 
     static public function getLogger($file_path = '')
     {
-        if (empty(self::$logger)) {
-            self::$logger = new Logger($file_path);
+        static $instance;
+        if (empty($instance)) {
+            $instance = new Logger($file_path);
         }
-        return self::$logger;
+        return $instance;
     }
 
     static public function debug($message)
