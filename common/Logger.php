@@ -1,6 +1,9 @@
 <?php
 class Logger
 {
+    /**
+     * log level
+     */
     const LEVEL_DEBUG = 'DEBUG';
     const LEVEL_INFO = 'INFO';
     const LEVEL_WARN = 'WARN';
@@ -17,6 +20,11 @@ class Logger
         self::LEVEL_FATAL,
     ];
 
+    /**
+     * __construct function
+     *
+     * @param string $file_path
+     */
     public function __construct($file_path = '')
     {
         if (!empty($file_path)) {
@@ -27,7 +35,7 @@ class Logger
                 $this->file_path = $file_path;
                 return;
             } else {
-                trigger_error(sprintf('log file is not open. file: %s', $file_path));
+                trigger_error(sprintf('Failed to open log file: %s', $file_path));
                 return;
             }
         }
@@ -37,28 +45,47 @@ class Logger
         $this->handle = fopen($this->file_path, 'a+');
 
         if ($this->handle == false) {
-            trigger_error(sprintf('log file is not open. file: %s', $this->file_path));
+            trigger_error(sprintf('Failed to open log file: %s', $this->file_path));
         }
     }
 
+    /**
+     * out function
+     *
+     * @param string $message
+     * @param string $level
+     * @return string|boolean
+     */
     public function out($message = null, $level = self::LEVEL_INFO)
     {
         $level = mb_strtoupper($level);
         if (is_null($message) || !is_string($message) || !in_array($level, $this->level_list)) {
-            return;
+            return false;
         }
 
         $now = Util::getDateString('Y-m-d H:i:s', 'now');
-        fwrite($this->handle, sprintf('[%s] [%s] %s', $level, $now, $message) . PHP_EOL);
-        return;
+        $log_message = sprintf('[%s] [%s] %s', $level, $now, $message) . PHP_EOL;
+        fwrite($this->handle, $log_message);
+        return $log_message;
     }
 
+    /**
+     * close function
+     *
+     * @return boolean
+     */
     public function close()
     {
         return fclose($this->handle);
     }
 
-    static public function getLogger($file_path = '')
+    /**
+     * getLogger function
+     *
+     * @param string $file_path
+     * @return Logger
+     */
+    public static function getLogger($file_path = '')
     {
         static $instance;
         if (empty($instance)) {
@@ -67,33 +94,63 @@ class Logger
         return $instance;
     }
 
-    static public function debug($message)
+    /**
+     * debug function
+     *
+     * @param string $message
+     * @return string|boolean
+     */
+    public static function debug($message)
     {
         $logger = self::getLogger();
-        $logger->out($message, self::LEVEL_DEBUG);
+        return $logger->out($message, self::LEVEL_DEBUG);
     }
 
-    static public function info($message)
+    /**
+     * info function
+     *
+     * @param string $message
+     * @return string|boolean
+     */
+    public static function info($message)
     {
         $logger = self::getLogger();
-        $logger->out($message, self::LEVEL_INFO);
+        return $logger->out($message, self::LEVEL_INFO);
     }
 
-    static public function warn($message)
+    /**
+     * warn function
+     *
+     * @param string $message
+     * @return string|boolean
+     */
+    public static function warn($message)
     {
         $logger = self::getLogger();
-        $logger->out($message, self::LEVEL_WARN);
+        return $logger->out($message, self::LEVEL_WARN);
     }
 
-    static public function error($message)
+    /**
+     * error function
+     *
+     * @param string $message
+     * @return string|boolean
+     */
+    public static function error($message)
     {
         $logger = self::getLogger();
-        $logger->out($message, self::LEVEL_ERROR);
+        return $logger->out($message, self::LEVEL_ERROR);
     }
 
-    static public function fatal($message)
+    /**
+     * fatal function
+     *
+     * @param string $message
+     * @return string|boolean
+     */
+    public static function fatal($message)
     {
         $logger = self::getLogger();
-        $logger->out($message, self::LEVEL_FATAL);
+        return $logger->out($message, self::LEVEL_FATAL);
     }
 }
