@@ -1,7 +1,15 @@
 <?php
 class Util
 {
-    static public function getDateString($format, $time, $time_format = null)
+    /**
+     * getDateString function
+     * 
+     * @param string $format
+     * @param int $tiem
+     * @param string $tiem_format
+     * @return string
+     */
+    public static function getDateString($format, $time, $time_format = null)
     {
         $date_time_zone = new DateTimeZone(TIME_ZONE);
         if (empty($time_format)) {
