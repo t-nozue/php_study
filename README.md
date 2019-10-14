@@ -1,2 +1,2 @@
-# study
+# php_study
 Coding practice
