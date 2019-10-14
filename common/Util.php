@@ -3,9 +3,9 @@ class Util
 {
     /**
      * getDateString function
-     * 
+     *
      * @param string $format
-     * @param int $tiem
+     * @param string $tiem
      * @param string $tiem_format
      * @return string
      */

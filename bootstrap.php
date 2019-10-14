@@ -1,6 +1,12 @@
 <?php
 require_once dirname(__FILE__) . '/define.php';
 
+/**
+ * autoLoadClass function
+ *
+ * @param string $classname
+ * @return boolean
+ */
 function autoLoadClass($classname)
 {
     // auto load directories
