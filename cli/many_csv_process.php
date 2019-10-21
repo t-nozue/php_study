@@ -34,7 +34,7 @@ class ManyCsvProcessor
                 } else {
                     // child process
                     $this->childProcess($csv_index);
-                    exit;
+                    exit(0);
                 }
             }
             foreach ($pid_list as $pid) {
@@ -53,24 +53,31 @@ class ManyCsvProcessor
      */
     private function childProcess($csv_index)
     {
-        // read csv file
-        $csv_file_path = sprintf(self::CSV_FILE_PATH, $csv_index);
-        $handle = fopen($csv_file_path, 'r');
-        if ($handle == false) {
-            echo Logger::error('Failed to open file: ' . $csv_file_path);
-            return;
-        }
+        $is_error =false;
+        try {
+            // read csv file
+            $csv_file_path = sprintf(self::CSV_FILE_PATH, $csv_index);
+            $handle = fopen($csv_file_path, 'r');
+            if ($handle == false) {
+                echo Logger::error('Failed to open file: ' . $csv_file_path);
+                return;
+            }
 
-        // TODO: do something
-        while (!feof($handle)) {
-            $csv_row = fgetcsv($handle);
+            // TODO: do something
+            while (!feof($handle)) {
+                $csv_row = fgetcsv($handle);
+            }
+        } catch (Exception $e) {
+            Logger::error($e->getMessage());
+            $is_error = false;
+        } finally {
+            // close csv file
+            fclose($handle);
         }
-
-        // close csv file
-        fclose($handle);
 
         // TODO: debug log
-        Logger::debug(sprintf('Complete process (file: %s)', $csv_file_path));
+        $message = ($is_error ? 'Failed' : 'Complete') . ' process (file: %s)';
+        Logger::debug(sprintf($message, $csv_file_path));
     }
 }
 
