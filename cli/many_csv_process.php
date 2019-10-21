@@ -1,5 +1,5 @@
 <?php
-init_set('memory_list', '1024M');
+ini_set('memory_list', '1024M');
 require_once dirname(__FILE__, 2) . '/bootstrap.php';
 
 class ManyCsvProcessor
