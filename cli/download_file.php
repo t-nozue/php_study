@@ -5,7 +5,7 @@ class DownloadFile
 {
     const PROGRAMS_XML ='http://www.onsen.ag/app/programs.xml';
     const DATA_ONSEN_DIR = DATA_DIR . '/onsen';
-    const DOWNLOAD_ID_LIST =[
+    const DOWNLOAD_ID_LIST = [
         'kamo',
     ];
 
@@ -13,8 +13,9 @@ class DownloadFile
     {
         $ch = curl_init(self::PROGRAMS_XML);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
         $result = curl_exec($ch);
+        curl_close($ch);
+
         if ($result == false) {
             Logger::error('curl error.');
             return 1;
@@ -26,7 +27,15 @@ class DownloadFile
 
         // download
         foreach ($this->getProgramList($result['program']) as $program) {
-            $file = $this->getFilePath($program['@attributes']['id'], $program['program_number']);
+            $file_path = $this->getFilePath($program['@attributes']['id'], $program['program_number']);
+            if (file_exists($file_path)) {
+                Logger::debug('File is Already downloaded: ' . $file_path);
+                continue;
+            }
+            $handle = fopen($file_path, 'w+');
+            $ch = curl_init($program['movie_url']);
+            curl_setopt($ch, CURLOPT_FILE, $handle);
+            curl_exec($ch);
         }
     }
 
@@ -34,7 +43,7 @@ class DownloadFile
     {
         $dir = self::DATA_ONSEN_DIR . '/' . $program_id;
         file_exists($dir) || mkdir($dir);
-        return $dir . '/' . $program_number;
+        return $dir . '/' . $program_number . '.mp3';
     }
 
     private function getProgramList($program_list)
