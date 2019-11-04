@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__, 2) . '/bootstrap.php';
+ini_set('memory_limit', '2024M');
 
 class DownloadFile
 {
@@ -7,6 +8,8 @@ class DownloadFile
     const DATA_ONSEN_DIR = DATA_DIR . '/onsen';
     const DOWNLOAD_ID_LIST = [
         'kamo',
+        'kakazu',
+        'yurucamp',
     ];
 
     public function main ()
@@ -26,7 +29,7 @@ class DownloadFile
         ), true);
 
         // download
-        foreach ($this->getProgramList($result['program']) as $program) {
+        foreach ($this->getProgramList($result) as $program) {
             $file_path = $this->getFilePath($program['@attributes']['id'], $program['program_number']);
             if (file_exists($file_path)) {
                 Logger::debug('File is Already downloaded: ' . $file_path);
@@ -48,7 +51,7 @@ class DownloadFile
 
     private function getProgramList($program_list)
     {
-        foreach ($program_list as $program) {
+        foreach ($program_list['program'] ?: [] as $program) {
             if (in_array($program['@attributes']['id'], self::DOWNLOAD_ID_LIST)) {
                 yield $program;
             }
